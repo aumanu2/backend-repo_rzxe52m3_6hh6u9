@@ -11,10 +11,10 @@ Model name is converted to lowercase for the collection name:
 - BlogPost -> "blogs" collection
 """
 
-from pydantic import BaseModel, Field
-from typing import Optional
+from pydantic import BaseModel, Field, EmailStr
+from typing import Optional, Literal
 
-# Example schemas (replace with your own):
+# Example schemas (you can keep these for reference):
 
 class User(BaseModel):
     """
@@ -22,7 +22,7 @@ class User(BaseModel):
     Collection name: "user" (lowercase of class name)
     """
     name: str = Field(..., description="Full name")
-    email: str = Field(..., description="Email address")
+    email: EmailStr = Field(..., description="Email address")
     address: str = Field(..., description="Address")
     age: Optional[int] = Field(None, ge=0, le=120, description="Age in years")
     is_active: bool = Field(True, description="Whether user is active")
@@ -38,11 +38,29 @@ class Product(BaseModel):
     category: str = Field(..., description="Product category")
     in_stock: bool = Field(True, description="Whether product is in stock")
 
-# Add your own schemas here:
-# --------------------------------------------------
+# Committee website schemas
 
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+class Event(BaseModel):
+    """Events offered by the committee (games, webinars, functions, etc.)
+    Collection name: "event"
+    """
+    title: str = Field(..., description="Event title")
+    type: Literal["game", "webinar", "function", "workshop", "meetup", "other"] = Field(
+        ..., description="Type of event"
+    )
+    date: Optional[str] = Field(None, description="Event date (ISO or human readable)")
+    time: Optional[str] = Field(None, description="Event time")
+    location: Optional[str] = Field(None, description="Location or platform (e.g., Zoom)")
+    description: Optional[str] = Field(None, description="Short description of the event")
+    registration_link: Optional[str] = Field(None, description="External registration URL if any")
+
+class Contribution(BaseModel):
+    """Member contributions or ideas for future activities
+    Collection name: "contribution"
+    """
+    name: str = Field(..., description="Your name")
+    email: EmailStr = Field(..., description="Contact email")
+    category: Literal["games", "webinars", "functions", "workshops", "other"] = Field(
+        "other", description="Area of contribution"
+    )
+    idea: str = Field(..., description="Describe your idea or how you want to help")
